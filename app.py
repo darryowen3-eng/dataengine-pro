@@ -20,8 +20,12 @@ app_mode = st.sidebar.radio(
 )
 
 st.sidebar.markdown("<br><br>---", unsafe_allow_html=True)
-st.sidebar.markdown("#### ⚙️ Core Engine Profile")
+st.sidebar.markdown("### 🚀 Need a Custom Data Pipeline?")
 st.sidebar.markdown("System Architecture engineered by **DARRY OWEN** for automated business file orchestration.")
+# 👇 Paste the link you copied from Calendly between the parenthesis below!
+st.sidebar.markdown("[👉 Book a Free 15-Min Strategy Session](https://calendly.com/darryowen3/30min)")
+
+
 
 # --- TASK 1: SINGLE FILE PROCESSING WORKFLOW ---
 if app_mode == "📄 Task 1: Single File Engine":
