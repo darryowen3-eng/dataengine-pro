@@ -7,81 +7,21 @@ import io
 # 1. Page Configuration Setup
 st.set_page_config(page_title="DataEngine Pro", layout="wide", page_icon="🧼")
 
-# 2. Premium Custom CSS Styling Injector
-st.markdown("""
-    <style>
-        /* Main page adjustments */
-        .block-container {
-            padding-top: 2rem !important;
-            padding-bottom: 2rem !important;
-        }
-        /* Style Streamlit Tabs to look like premium dashboard switches */
-        button[data-baseweb="tab"] {
-            font-size: 14px !important;
-            font-weight: 600 !important;
-            color: #4a5568 !important;
-            border-bottom: 2px solid transparent !important;
-            padding: 10px 20px !important;
-        }
-        button[data-baseweb="tab"][aria-selected="true"] {
-            color: #1a73e8 !important;
-            border-bottom: 2px solid #1a73e8 !important;
-        }
-        /* Custom Button Styling */
-        .stButton>button {
-            background-color: #1a73e8 !important;
-            color: white !important;
-            border-radius: 6px !important;
-            padding: 10px 24px !important;
-            font-weight: 600 !important;
-            border: none !important;
-            transition: all 0.3s ease !important;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
-        }
-        .stButton>button:hover {
-            background-color: #1557b0 !important;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15) !important;
-            transform: translateY(-1px);
-        }
-        /* Clean header styling */
-        h1 {
-            color: #1e293b !important;
-            font-weight: 700 !important;
-        }
-        h3 {
-            color: #334155 !important;
-            font-weight: 600 !important;
-            margin-top: 1rem !important;
-        }
-        /* Sidebar layout enhancements */
-        section[data-testid="stSidebar"] {
-            background-color: #f8fafc !important;
-            border-right: 1px solid #e2e8f0;
-        }
-        /* Styled Metric Cards Wrapper */
-        div[data-testid="stMetricValue"] {
-            font-size: 28px !important;
-            font-weight: 700 !important;
-            color: #1e293b !important;
-        }
-    </style>
-""", unsafe_allow_html=True)
-
-# 3. Header & Branding Section
+# 2. Header & Branding Section
 st.title("🧼 DataEngine™ Pro")
-st.markdown("<p style='font-size:16px; color:#64748b; margin-top:-10px;'>Enterprise-grade file preprocessing, automated anomaly isolation, and unified reporting architecture.</p>", unsafe_allow_html=True)
+st.markdown("Enterprise-grade file preprocessing, automated anomaly isolation, and unified reporting architecture.")
 st.markdown("---")
 
-# 4. Sidebar Workflow Selector
-st.sidebar.markdown("<h2 style='font-size:20px; color:#1e293b; margin-bottom:15px;'>🎛️ Control Panel</h2>", unsafe_allow_html=True)
+# 3. Sidebar Workflow Selector
+st.sidebar.header("🎛️ Control Panel")
 app_mode = st.sidebar.radio(
     "Select Target Workflow Matrix:",
     ["📄 Task 1: Single File Engine", "🔗 Task 2: Multi-File Cross-Blender"]
 )
 
 st.sidebar.markdown("<br><br>---", unsafe_allow_html=True)
-st.sidebar.markdown("<h4 style='color:#475569; margin-bottom:5px;'>⚙️ Core Engine Profile</h4>", unsafe_allow_html=True)
-st.sidebar.markdown("<p style='font-size:13px; color:#64748b; line-height:1.4;'>System Architecture engineered by <strong>DARRY OWEN</strong> for automated business file orchestration.</p>", unsafe_allow_html=True)
+st.sidebar.markdown("#### ⚙️ Core Engine Profile")
+st.sidebar.markdown("System Architecture engineered by **DARRY OWEN** for automated business file orchestration.")
 
 # --- TASK 1: SINGLE FILE PROCESSING WORKFLOW ---
 if app_mode == "📄 Task 1: Single File Engine":
@@ -152,9 +92,8 @@ if app_mode == "📄 Task 1: Single File Engine":
         with tab3:
             if 'single_cleaned_data' in st.session_state:
                 df = st.session_state['single_cleaned_data']
-                if 'Date' in df.columns: df = df.sort_values(by='Date')
                 
-                st.subheader("📈 Dynamic Visualization Workspace")
+                st.subheader("📊 Dynamic Visualization Workspace")
                 
                 vc1, vc2 = st.columns(2)
                 with vc1:
@@ -162,19 +101,23 @@ if app_mode == "📄 Task 1: Single File Engine":
                 with vc2:
                     col_y = st.selectbox("Assign Primary Performance Metric (Y-Axis):", options=df.columns, key="s_y")
                 
+                if col_x in df.columns:
+                    df = df.dropna(subset=[col_x])
+                    df = df.sort_values(by=col_x)
+                
                 fig = go.Figure()
                 fig.add_trace(go.Scatter(
                     x=df[col_x], y=df[col_y], 
                     mode='lines+markers', 
                     name=str(col_y),
+                    connectgaps=True,
                     line=dict(color='#1a73e8', width=3),
                     marker=dict(size=6, color='#1557b0')
                 ))
                 fig.update_layout(
                     xaxis_title=str(col_x), 
                     yaxis_title=str(col_y), 
-                    template="plotly_white",
-                    margin=dict(l=40, r=40, t=20, b=40)
+                    template="plotly_white"
                 )
                 st.plotly_chart(fig, use_container_width=True)
             else:
@@ -201,3 +144,119 @@ elif app_mode == "🔗 Task 2: Multi-File Cross-Blender":
             
         with tab2:
             st.subheader("Configure Sequential File Cleansing")
+            target_clean_file = st.selectbox("Target isolation workspace stream:", file_names, key="m_cl_sel")
+            
+            mc1, mc2 = st.columns(2)
+            with mc1:
+                remove_dup = st.checkbox("Purge file records duplicates", value=True, key="m_dup")
+                strip_spaces = st.checkbox("Scrub internal text column paddings", value=True, key="m_space")
+            with mc2:
+                clean_money = st.checkbox("Scrub numeric column string currency items", value=True, key="m_money")
+                standardize_dates = st.checkbox("Auto-standardize layout timestamps", value=True, key="m_date")
+            
+            st.markdown("<br>", unsafe_allow_html=True)
+            if st.button("🚀 Execute Optimization Profile on Stream", key="m_run"):
+                cleaned = file_dict[target_clean_file].copy()
+                if remove_dup: cleaned = cleaned.drop_duplicates()
+                if strip_spaces:
+                    for col in cleaned.select_dtypes(include=['object']).columns:
+                        cleaned[col] = cleaned[col].astype(str).str.strip()
+                if clean_money:
+                    for col in cleaned.columns:
+                        if cleaned[col].dtype == 'object' and cleaned[col].str.contains(r'[\$,%]', regex=True, na=False).any():
+                            cleaned[col] = cleaned[col].str.replace(r'[\$,% ]', '', regex=True)
+                            cleaned[col] = pd.to_numeric(cleaned[col], errors='coerce')
+                if standardize_dates:
+                    for col in cleaned.columns:
+                        if 'date' in col.lower() or 'time' in col.lower():
+                            cleaned[col] = pd.to_datetime(cleaned[col], errors='coerce')
+                
+                if 'multi_cleaned_files' not in st.session_state:
+                    st.session_state['multi_cleaned_files'] = {}
+                st.session_state['multi_cleaned_files'][target_clean_file] = cleaned
+                st.success(f"🎉 Cleansed data matrix stream for '{target_clean_file}' held successfully in staging memory.")
+                
+            if 'multi_cleaned_files' in st.session_state:
+                st.markdown("<br>", unsafe_allow_html=True)
+                st.info(f"Verified Streams Staged in Memory: {list(st.session_state['multi_cleaned_files'].keys())}")
+
+        with tab3:
+            st.subheader("🔗 Multi-Matrix Intersect / Blend Settings")
+            if 'multi_cleaned_files' in st.session_state and len(st.session_state['multi_cleaned_files']) >= 2:
+                clean_names = list(st.session_state['multi_cleaned_files'].keys())
+                
+                jc1, jc2 = st.columns(2)
+                with jc1:
+                    col_a = st.selectbox("Primary Baseline Dataset (Matrix A):", clean_names, key="join_a")
+                    key_a = st.selectbox("Assign Primary Key Identifier:", st.session_state['multi_cleaned_files'][col_a].columns, key="key_a")
+                with jc2:
+                    col_b = st.selectbox("Relational Target Dataset (Matrix B):", [n for n in clean_names if n != col_a], key="join_b")
+                    key_b = st.selectbox("Assign Relational Match Key:", st.session_state['multi_cleaned_files'][col_b].columns, key="key_b")
+                
+                st.markdown("<br>", unsafe_allow_html=True)
+                if st.button("🔗 Execute Relational Structural Blend", key="merge_run"):
+                    df_a = st.session_state['multi_cleaned_files'][col_a].copy()
+                    df_b = st.session_state['multi_cleaned_files'][col_b].copy()
+                    
+                    df_a[key_a] = df_a[key_a].astype(str)
+                    df_b[key_b] = df_b[key_b].astype(str)
+                    
+                    merged = pd.merge(df_a, df_b, left_on=key_a, right_on=key_b, how="outer", suffixes=('_A', '_B'))
+                    
+                    if key_a == 'Date' and 'Date_A' in merged.columns and 'Date_B' in merged.columns:
+                        merged['Date'] = merged['Date_A'].fillna(merged['Date_B'])
+                        merged = merged.drop(columns=['Date_A', 'Date_B'])
+                        
+                    st.session_state['final_merged_data'] = merged
+                    st.success("🎉 Cross-platform relational blend successful! Master matrix built.")
+                    st.dataframe(merged.head(10), use_container_width=True)
+            else:
+                st.warning("⚠️ Cross-platform blending blocks require optimizing at least two individual data streams inside Tab 2.")
+
+
+
+        with tab4:
+            if 'final_merged_data' in st.session_state:
+                df = st.session_state['final_merged_data'].copy()
+                
+                st.subheader("📊 Cross-Channel Business Executive Analytics")
+                
+                m_col1, m_col2, m_col3 = st.columns(3)
+                if 'Gross_Revenue' in df.columns:
+                    m_col1.metric("💰 Consolidated Gross Revenue", f"${df['Gross_Revenue'].sum():,.2f}")
+                if 'Amount_Spent' in df.columns:
+                    m_col2.metric("📉 Aggregate Operational Outlay", f"${df['Amount_Spent'].sum():,.2f}")
+                if 'Gross_Revenue' in df.columns and 'Amount_Spent' in df.columns:
+                    rev, spent = df['Gross_Revenue'].sum(), df['Amount_Spent'].sum()
+                    if spent > 0:
+                        m_col3.metric("🚀 Compounded Return Metrics", f"{(rev/spent):.2f}x ROAS", delta=f"{((rev/spent)-1)*100:.1f}% Net Return")
+                
+                st.markdown("---")
+                st.subheader("📈 Unified Multi-Channel Plotting Engine")
+
+                
+                cc1, cc2, cc3 = st.columns(3)
+                with cc1:
+                    col_x = st.selectbox("Horizontal Scale Core Index:", options=df.columns, key="m_x")
+                with cc2:
+                    col_y1 = st.selectbox("Plot Line Vector Alpha:", options=df.columns, key="m_y1")
+                with cc3:
+                    opts = list(df.columns)
+                    opts.insert(0, "None")
+                    col_y2 = st.selectbox("Plot Line Vector Beta (Optional):", options=opts, key="m_y2")
+                
+                if col_x in df.columns:
+                    df = df.dropna(subset=[col_x])
+                    df[col_x] = df[col_x].astype(str)
+                    df = df.sort_values(by=col_x)
+                
+                fig = go.Figure()
+                fig.add_trace(go.Scatter(x=df[col_x], y=df[col_y1], mode='lines+markers', name=str(col_y1), connectgaps=True, line=dict(color='#1a73e8', width=3)))
+                if col_y2 != "None":
+                    fig.add_trace(go.Scatter(x=df[col_x], y=df[col_y2], mode='lines+markers', name=str(col_y2), connectgaps=True, line=dict(color='#e74c3c', width=3)))
+                    
+                fig.update_layout(xaxis_title=str(col_x), yaxis_title="Operational Value Metrics", template="plotly_white")
+                st.plotly_chart(fig, use_container_width=True)
+            else:
+                # 🟢 Safety notification banner when memory is empty
+                st.info("💡 Establish your matrix connection mapping options inside the 'Relational Blend Engine' tab first to generate tracking lines.")
